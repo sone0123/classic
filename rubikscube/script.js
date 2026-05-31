@@ -1,19 +1,24 @@
+// id=cube要素を取得
 const cube = document.getElementById('cube');
+// cubie間の間隔
 const gap = 60; 
-
+// cubieデータを格納する配列
 const cubies = [];
-
+// cubeを構築
 for (let x = -1; x <= 1; x++) {
     for (let y = -1; y <= 1; y++) {
         for (let z = -1; z <= 1; z++) {
+            // 中央にcubieを置かない
             if (x === 0 && y === 0 && z === 0) continue;
-
+            // cubie用のHTML要素を作成
             const cubie = document.createElement('div');
+            // cubieにcubieクラスを追加
             cubie.classList.add('cubie');
-
+            // cubieの初期配置
             const baseTransform = `translate3d(${x * gap}px, ${y * gap}px, ${z * gap}px)`;
+            // cubieのスタイルに初期配置を適用
             cubie.style.transform = baseTransform;
-
+            // 各面の色を決定 (内側は黒，外側は各色を設定)
             const facesList = [
                 { name: 'front',  color: z ===  1 ? 'red'    : '#111' },
                 { name: 'back',   color: z === -1 ? 'orange' : '#111' },
@@ -22,23 +27,27 @@ for (let x = -1; x <= 1; x++) {
                 { name: 'top',    color: y === -1 ? 'white'  : '#111' },
                 { name: 'bottom', color: y ===  1 ? 'yellow' : '#111' }
             ];
-
+            // cubieに各面の要素を作成して追加
             facesList.forEach(face => {
+                // 面のHTML要素を作成
                 const faceEl = document.createElement('div');
+                // 面のクラスとスタイルを設定
                 faceEl.classList.add('face', face.name);
                 faceEl.style.backgroundColor = face.color;
+                // 面のデータ属性に面の名前と色を保存
                 faceEl.dataset.faceName = face.name; 
-                faceEl.dataset.colorName = face.color; // クリア判定用に色の名前を保持
+                faceEl.dataset.colorName = face.color;
+                // cubieに面の要素を追加
                 cubie.appendChild(faceEl);
             });
-
+            // cubieをキューブに追加
             cube.appendChild(cubie);
-
+            // cubieのデータをcubies配列に保存
             cubies.push({
                 element: cubie,
                 x: x, y: y, z: z,
                 transformString: baseTransform,
-                // 各面が「今グローバル座標空間においてどちらを向いているか」
+                // 各面がどの方向を向いているかを表すベクトル
                 normals: {
                     front:  { x: 0, y: 0, z: 1 },
                     back:   { x: 0, y: 0, z:-1 },
@@ -53,12 +62,15 @@ for (let x = -1; x <= 1; x++) {
 }
 
 // ========================
-// 1. 全体回転
+// cube全体の回転処理
 // ========================
+
+// グローバルなドラッグ状態と位置を管理する変数
 let isGlobalDragging = false;
 let globalPreviousPos = { x: 0, y: 0 };
 let currentRotation = { x: -30, y: -45 };
 
+// cube要素はドラッグしない
 function onGlobalPointerDown(e) {
     if (e.target.closest('#cube')) return;
     isGlobalDragging = true;
@@ -67,8 +79,11 @@ function onGlobalPointerDown(e) {
     globalPreviousPos = { x: clientX, y: clientY };
 }
 
+// ドラッグ移動でcube全体を回転
 function onGlobalPointerMove(e) {
     if (!isGlobalDragging) return;
+    // タッチイベント時スクロール防止
+    if (e.touches && e.cancelable) e.preventDefault();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     const dx = clientX - globalPreviousPos.x;
@@ -81,10 +96,12 @@ function onGlobalPointerMove(e) {
     globalPreviousPos = { x: clientX, y: clientY };
 }
 
+// ドラッグ終了
 function onGlobalPointerUp() {
     isGlobalDragging = false;
 }
 
+// マウスとタッチの両方に対応するイベントリスナー
 document.addEventListener('mousedown', onGlobalPointerDown);
 document.addEventListener('mousemove', onGlobalPointerMove);
 document.addEventListener('mouseup', onGlobalPointerUp);
@@ -93,7 +110,7 @@ document.addEventListener('touchmove', onGlobalPointerMove, {passive: false});
 document.addEventListener('touchend', onGlobalPointerUp);
 
 // ========================
-// 2. ブロック(層)の回転処理
+// 各ブロックの回転処理
 // ========================
 let isBlockDragging = false;
 let blockStartPos = { x: 0, y: 0 };
@@ -280,7 +297,7 @@ function rotateLayer(axis, sliceValue, dir, duration = 300, onComplete = null) {
 }
 
 // ========================
-// 3. スクランブルとゲーム進行
+// ゲーム進行
 // ========================
 const scrambleBtn = document.getElementById('scrambleBtn');
 const timerDisplay = document.getElementById('timerDisplay');
@@ -351,7 +368,7 @@ function performScramble(movesLeft) {
 }
 
 // ========================
-// 4. クリア判定
+// クリア判定
 // ========================
 function checkSolved() {
     const directions = [
