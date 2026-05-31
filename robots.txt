@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sone0123.github.io/classic/sitemap.xml
