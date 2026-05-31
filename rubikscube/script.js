@@ -250,7 +250,10 @@ function rotateLayer(axis, sliceValue, dir, duration = 300, onComplete = null) {
     layerEl.style.transform = `rotate${axis.toUpperCase()}(${dir * 90}deg)`;
 
     // アニメーション完了後に元のキューブに戻し、各ブロック自身のTransformに回転を焼き付ける
-    setTimeout(() => {
+    layerEl.addEventListener('transitionend', function handler(e) {
+        if (e.target !== layerEl) return;
+        layerEl.removeEventListener('transitionend', handler);
+
         movingCubies.forEach(c => {
             c.transformString = `rotate${axis.toUpperCase()}(${dir * 90}deg) ` + c.transformString;
             c.element.style.transform = c.transformString;
@@ -292,8 +295,8 @@ function rotateLayer(axis, sliceValue, dir, duration = 300, onComplete = null) {
 
         layerEl.remove(); // アニメーション用ラッパーを削除
         isAnimating = false;
-    if (onComplete) onComplete();
-    }, duration);
+        if (onComplete) onComplete();
+    });
 }
 
 // ========================
