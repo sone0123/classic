@@ -125,16 +125,13 @@ body {
     transform: scale(0.95);
 }
 
+/* HUD */
 #statusHUD {
     font-family: "Noto Sans Mono", monospace;
     position: absolute;
     bottom: 20px;
     font-size: 1.4rem;
-    font-family: monospace;
-    background-color: rgba(0, 0, 0, 0.6);
     color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
     pointer-events: none;
     z-index: 10;
 }
@@ -145,6 +142,8 @@ body {
     display: inline-block;
     vertical-align: middle;
     margin-right: 10px;
+    position: relative;
+    top: 2px;
 }
 
 /* カウントアイコン */
@@ -153,4 +152,6 @@ body {
     display: inline-block;
     vertical-align: middle;
     margin-right: 10px;
+    position: relative;
+    top: 2px;
 }
