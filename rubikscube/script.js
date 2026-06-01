@@ -1,19 +1,25 @@
+// id=cube要素を取得
 const cube = document.getElementById('cube');
+// cubie間の間隔
 const gap = 60; 
-
+// cubieデータを格納する配列
 const cubies = [];
 
+// cubeを構築
 for (let x = -1; x <= 1; x++) {
     for (let y = -1; y <= 1; y++) {
         for (let z = -1; z <= 1; z++) {
+            // 中央にcubieを置かない
             if (x === 0 && y === 0 && z === 0) continue;
-
+            // cubie用のHTML要素を作成
             const cubie = document.createElement('div');
+            // cubieにcubieクラスを追加
             cubie.classList.add('cubie');
-
+            // cubieの初期配置
             const baseTransform = `translate3d(${x * gap}px, ${y * gap}px, ${z * gap}px)`;
+            // cubieのスタイルに初期配置を適用
             cubie.style.transform = baseTransform;
-
+            // 各面の色を決定 (内側は黒，外側は各色を設定)
             const facesList = [
                 { name: 'front',  color: z ===  1 ? 'red'    : '#111' },
                 { name: 'back',   color: z === -1 ? 'orange' : '#111' },
@@ -22,23 +28,27 @@ for (let x = -1; x <= 1; x++) {
                 { name: 'top',    color: y === -1 ? 'white'  : '#111' },
                 { name: 'bottom', color: y ===  1 ? 'yellow' : '#111' }
             ];
-
+            // cubieに各面の要素を作成して追加
             facesList.forEach(face => {
+                // 面のHTML要素を作成
                 const faceEl = document.createElement('div');
+                // 面のクラスとスタイルを設定
                 faceEl.classList.add('face', face.name);
-                faceEl.style.backgroundColor = face.color;
+                faceEl.style.setProperty('--face-color', face.color);
+                // 面のデータ属性に面の名前と色を保存
                 faceEl.dataset.faceName = face.name; 
-                faceEl.dataset.colorName = face.color; // クリア判定用に色の名前を保持
+                faceEl.dataset.colorName = face.color;
+                // cubieに面の要素を追加
                 cubie.appendChild(faceEl);
             });
-
+            // cubieをキューブに追加
             cube.appendChild(cubie);
-
+            // cubieのデータをcubies配列に保存
             cubies.push({
                 element: cubie,
                 x: x, y: y, z: z,
                 transformString: baseTransform,
-                // 各面が「今グローバル座標空間においてどちらを向いているか」
+                // 各面がどの方向を向いているかを表すベクトル
                 normals: {
                     front:  { x: 0, y: 0, z: 1 },
                     back:   { x: 0, y: 0, z:-1 },
@@ -53,12 +63,15 @@ for (let x = -1; x <= 1; x++) {
 }
 
 // ========================
-// 1. 全体回転
+// cube全体の回転処理
 // ========================
+
+// グローバルなドラッグ状態と位置を管理する変数
 let isGlobalDragging = false;
 let globalPreviousPos = { x: 0, y: 0 };
 let currentRotation = { x: -30, y: -45 };
 
+// cube要素はドラッグしない
 function onGlobalPointerDown(e) {
     if (e.target.closest('#cube')) return;
     isGlobalDragging = true;
@@ -67,8 +80,11 @@ function onGlobalPointerDown(e) {
     globalPreviousPos = { x: clientX, y: clientY };
 }
 
+// ドラッグ移動でcube全体を回転
 function onGlobalPointerMove(e) {
     if (!isGlobalDragging) return;
+    // タッチイベント時スクロール防止
+    if (e.touches && e.cancelable) e.preventDefault();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     const dx = clientX - globalPreviousPos.x;
@@ -81,10 +97,12 @@ function onGlobalPointerMove(e) {
     globalPreviousPos = { x: clientX, y: clientY };
 }
 
+// ドラッグ終了
 function onGlobalPointerUp() {
     isGlobalDragging = false;
 }
 
+// マウスとタッチの両方に対応するイベントリスナー
 document.addEventListener('mousedown', onGlobalPointerDown);
 document.addEventListener('mousemove', onGlobalPointerMove);
 document.addEventListener('mouseup', onGlobalPointerUp);
@@ -93,16 +111,19 @@ document.addEventListener('touchmove', onGlobalPointerMove, {passive: false});
 document.addEventListener('touchend', onGlobalPointerUp);
 
 // ========================
-// 2. ブロック(層)の回転処理
+// 各ブロックの回転処理
 // ========================
+
 let isBlockDragging = false;
 let blockStartPos = { x: 0, y: 0 };
 let clickedFaceName = null;
 let clickedCubieData = null;
 let isAnimating = false;
 
+// ブロックのドラッグ開始時の処理を管理する関数
 function onBlockPointerDown(e) {
-    if (isAnimating) return; 
+    if (isAnimating) return;
+
     const faceEl = e.target.closest('.face');
     if (!faceEl) return;
 
@@ -116,6 +137,7 @@ function onBlockPointerDown(e) {
     blockStartPos = { x: clientX, y: clientY };
 }
 
+// ブロックのドラッグ移動でスワイプを判定し回転処理を呼び出す関数
 function onBlockPointerMove(e) {
     if (!isBlockDragging || isAnimating || !clickedCubieData) return;
 
@@ -124,18 +146,19 @@ function onBlockPointerMove(e) {
     const dx = clientX - blockStartPos.x;
     const dy = clientY - blockStartPos.y;
 
-    // スワイプ判定のしきい値を少し下げて反応を良くする
     if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
         isBlockDragging = false;
         handleSwipe(dx, dy, clickedFaceName, clickedCubieData);
     }
 }
 
+// ブロックのドラッグ終了時の処理を管理する関数
 function onBlockPointerUp() {
     isBlockDragging = false;
     clickedCubieData = null;
 }
 
+// マウスとタッチの両方に対応するイベントリスナー
 cube.addEventListener('mousedown', onBlockPointerDown);
 document.addEventListener('mousemove', onBlockPointerMove);
 document.addEventListener('mouseup', onBlockPointerUp);
@@ -143,17 +166,18 @@ cube.addEventListener('touchstart', onBlockPointerDown, {passive: false});
 document.addEventListener('touchmove', onBlockPointerMove, {passive: false});
 document.addEventListener('touchend', onBlockPointerUp);
 
+// スワイプの方向から回転させる層と回転方向を判定し回転処理を呼び出す関数
 function handleSwipe(dx, dy, faceName, cubie) {
-    // クリックした面が「現在」どちらを向いているか (バグ修正の要)
+    // クリックした面が「現在」どちらを向いているかを取得
     const n = cubie.normals[faceName];
-    
-    // 回転可能な軸の候補（クリックした面と垂直な2軸）
+
+    // 回転可能な軸の候補をクリックした面の法線ベクトルから決定
     let axes = [];
     if (Math.abs(n.x) > 0.5) axes = [{name: 'y', vec: {x:0, y:1, z:0}}, {name: 'z', vec: {x:0, y:0, z:1}}];
     else if (Math.abs(n.y) > 0.5) axes = [{name: 'x', vec: {x:1, y:0, z:0}}, {name: 'z', vec: {x:0, y:0, z:1}}];
-    else axes = [{name: 'x', vec: {x:1, y:0, z:0}}, {name: 'y', vec: {x:0, y:1, z:0}}];
-
-    // 3Dベクトルを現在のカメラ角度に合わせて画面(2D)上に投影する関数
+    else axes = [{ name: 'x', vec: { x: 1, y: 0, z: 0 } }, { name: 'y', vec: { x: 0, y: 1, z: 0 } }];
+    
+    // 3Dベクトルを現在のカメラ角度に合わせて画面上に投影する関数
     function project(vec) {
         const rx = currentRotation.x * Math.PI / 180;
         const ry = currentRotation.y * Math.PI / 180;
@@ -170,7 +194,7 @@ function handleSwipe(dx, dy, faceName, cubie) {
     let maxDot = -Infinity;
 
     axes.forEach(a => {
-        // 対象の軸を中心に+90度回転した時に、クリックした面がどちらに動くか (外積)
+        // 回転した時にクリックした面がどちらに動くか
         const cross = {
             x: a.vec.y * n.z - a.vec.z * n.y,
             y: a.vec.z * n.x - a.vec.x * n.z,
@@ -180,7 +204,7 @@ function handleSwipe(dx, dy, faceName, cubie) {
         const proj = project(cross);
         // 画面上でのドラッグ方向との一致度を計算
         const dot = proj.x * dx + proj.y * dy;
-        
+
         if (Math.abs(dot) > maxDot) {
             maxDot = Math.abs(dot);
             bestAxis = a.name;
@@ -190,56 +214,61 @@ function handleSwipe(dx, dy, faceName, cubie) {
 
     const sliceValue = cubie[bestAxis];
 
+    // ゲーム中手数をカウントして表示を更新
     if (isPlaying) {
         moveCount++;
         updateStatusDisplay();
     }
-
+    
+    // 座標更新後のクリア判定
     rotateLayer(bestAxis, sliceValue, bestDir, 300, () => {
-        // アニメーション完了・座標更新後にクリア判定を行う
         if (isPlaying && checkSolved()) {
             isPlaying = false;
             if (timerInterval) clearInterval(timerInterval);
             
             setTimeout(() => {
                 alert(`CLEARED\nTime: ${timerDisplay.textContent}\nMoves: ${moveCount}`);
-                scrambleBtn.textContent = "scramble (again)";
             }, 50); 
         }
     });
 }
 
+// 指定した軸とスライス値に該当するブロックを回転させる関数
 function rotateLayer(axis, sliceValue, dir, duration = 300, onComplete = null) {
     isAnimating = true;
 
     const movingCubies = cubies.filter(c => c[axis] === sliceValue);
 
-    // アニメーション用に専用の「層」ラッパーを作成する
+    // アニメーション用ラッパーを作成
     const layerEl = document.createElement('div');
     layerEl.classList.add('layer');
-    // スピードをカスタマイズできるようにする
+
+    // スピードをカスタマイズ可能にする
     layerEl.style.transition = `transform ${duration}ms ease-in-out`;
     cube.appendChild(layerEl);
 
-    // 動かすブロックを一旦ラッパーにまとめる
+    // 動かすブロックをラッパーにまとめる
     movingCubies.forEach(c => {
         layerEl.appendChild(c.element);
     });
 
-    // ブラウザにDOMの変更を認識させてからアニメーション開始 (リフロー強制)
+    // ブラウザにDOMの変更を認識させてからアニメーション開始
     layerEl.getBoundingClientRect();
 
-    // ラッパーをごと回転させる（CSSのアニメーションが美しく効く）
+    // ラッパーを回転させる
     layerEl.style.transform = `rotate${axis.toUpperCase()}(${dir * 90}deg)`;
 
-    // アニメーション完了後に元のキューブに戻し、各ブロック自身のTransformに回転を焼き付ける
-    setTimeout(() => {
+    // アニメーション完了後に焼き付ける
+    layerEl.addEventListener('transitionend', function handler(e) {
+        if (e.target !== layerEl) return;
+        layerEl.removeEventListener('transitionend', handler);
+
         movingCubies.forEach(c => {
             c.transformString = `rotate${axis.toUpperCase()}(${dir * 90}deg) ` + c.transformString;
             c.element.style.transform = c.transformString;
-            cube.appendChild(c.element); // キューブに戻す
+            cube.appendChild(c.element); // cubeに戻す
             
-            // CSS回転後の論理的な論理座標 (x, y, z) を更新 
+            // CSS回転後の論理的な論理座標を更新 
             let nx = c.x, ny = c.y, nz = c.z;
             if (axis === 'x') {
                 ny = dir === 1 ? -c.z : c.z;
@@ -255,7 +284,7 @@ function rotateLayer(axis, sliceValue, dir, duration = 300, onComplete = null) {
             c.y = Math.round(ny);
             c.z = Math.round(nz);
 
-            // 各面がどちらを向いているか (normals) の情報も更新
+            // 各面がどちらを向いているかの情報も更新
             for (const key in c.normals) {
                 let vec = c.normals[key];
                 let vnx = vec.x, vny = vec.y, vnz = vec.z;
@@ -275,13 +304,14 @@ function rotateLayer(axis, sliceValue, dir, duration = 300, onComplete = null) {
 
         layerEl.remove(); // アニメーション用ラッパーを削除
         isAnimating = false;
-    if (onComplete) onComplete();
-    }, duration);
+        if (onComplete) onComplete();
+    });
 }
 
 // ========================
-// 3. スクランブルとゲーム進行
+// ゲーム進行
 // ========================
+
 const scrambleBtn = document.getElementById('scrambleBtn');
 const timerDisplay = document.getElementById('timerDisplay');
 const moveCountDisplay = document.getElementById('moveCountDisplay');
@@ -291,6 +321,7 @@ let startTime = null;
 let timerInterval = null;
 let moveCount = 0;
 
+// スクランブルボタンがクリックされたときの処理を管理する関数
 scrambleBtn.addEventListener('click', () => {
     if (isAnimating) return;
     
@@ -304,6 +335,7 @@ scrambleBtn.addEventListener('click', () => {
     performScramble(20); // 20回ランダムに回す
 });
 
+// ゲーム開始時のタイマー開始と状態管理を行う関数
 function startTimer() {
     isPlaying = true;
     startTime = Date.now();
@@ -316,6 +348,7 @@ function startTimer() {
     }, 1000);
 }
 
+// タイマーと手数の表示を更新する関数
 function updateStatusDisplay() {
     if (!isPlaying) return;
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -325,16 +358,16 @@ function updateStatusDisplay() {
     moveCountDisplay.textContent = moveCount;
 }
 
+// 指定した回数だけランダムに回す関数
 function performScramble(movesLeft) {
     if (movesLeft <= 0) {
         scrambleBtn.disabled = false;
-        scrambleBtn.textContent = "scramble";
-        startTimer(); // スクランブル完了時にタイマー開始
+        // スクランブル完了時にタイマー開始
+        startTimer();
         return;
     }
 
     scrambleBtn.disabled = true;
-    scrambleBtn.textContent = `scrambling... (${movesLeft})`;
 
     const axes = ['x', 'y', 'z'];
     const slices = [-1, 0, 1];
@@ -344,23 +377,25 @@ function performScramble(movesLeft) {
     const randomSlice = slices[Math.floor(Math.random() * slices.length)];
     const randomDir = dirs[Math.floor(Math.random() * dirs.length)];
 
-    // アニメーション時間を100msにして高速に回す
-    rotateLayer(randomAxis, randomSlice, randomDir, 100, () => {
+    // 高速に回す
+    rotateLayer(randomAxis, randomSlice, randomDir, 150, () => {
         performScramble(movesLeft - 1);
     });
 }
 
 // ========================
-// 4. クリア判定
+// クリア判定
 // ========================
+
+// 各面が同じ色で揃っているかを判定する関数
 function checkSolved() {
     const directions = [
         { axis: 'z', val: 1, vec: {x:0, y:0, z:1} },
         { axis: 'z', val:-1, vec: {x:0, y:0, z:-1} },
         { axis: 'x', val: 1, vec: {x:1, y:0, z:0} },
         { axis: 'x', val:-1, vec: {x:-1, y:0, z:0} },
-        { axis: 'y', val:-1, vec: {x:0, y:-1, z:0} }, // top
-        { axis: 'y', val: 1, vec: {x:0, y:1, z:0} }   // bottom
+        { axis: 'y', val:-1, vec: {x:0, y:-1, z:0} },
+        { axis: 'y', val: 1, vec: {x:0, y:1, z:0} }
     ];
 
     for (let d of directions) {
@@ -380,12 +415,12 @@ function checkSolved() {
             const faceEl = Array.from(c.element.children).find(el => el.dataset.faceName === facingName);
             const color = faceEl.dataset.colorName;
 
-            if (color === '#111') return false; // 黒(内部)が外を向いていたら不正解
+            if (color === '#111') return false;
 
             if (firstColor === null) {
                 firstColor = color;
             } else if (firstColor !== color) {
-                return false; // 面の色が揃っていない
+                return false;
             }
         }
     }
