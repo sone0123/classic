@@ -34,7 +34,7 @@ for (let x = -1; x <= 1; x++) {
                 const faceEl = document.createElement('div');
                 // 面のクラスとスタイルを設定
                 faceEl.classList.add('face', face.name);
-                faceEl.style.backgroundColor = face.color;
+                faceEl.style.setProperty('--face-color', face.color);
                 // 面のデータ属性に面の名前と色を保存
                 faceEl.dataset.faceName = face.name; 
                 faceEl.dataset.colorName = face.color;
@@ -381,7 +381,7 @@ function performScramble(movesLeft) {
     const randomDir = dirs[Math.floor(Math.random() * dirs.length)];
 
     // 高速に回す
-    rotateLayer(randomAxis, randomSlice, randomDir, 100, () => {
+    rotateLayer(randomAxis, randomSlice, randomDir, 150, () => {
         performScramble(movesLeft - 1);
     });
 }
