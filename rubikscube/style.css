@@ -104,25 +104,8 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    background-color: #3498db;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
+    color: white;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: background 0.2s, transform 0.1s;
-    line-height: 1;
-}
-
-#homeBtn:hover {
-    background-color: #2980b9;
-}
-
-#homeBtn:active {
-    transform: scale(0.95);
 }
 
 /* HUD */
