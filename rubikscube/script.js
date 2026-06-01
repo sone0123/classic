@@ -228,9 +228,6 @@ function handleSwipe(dx, dy, faceName, cubie) {
             
             setTimeout(() => {
                 alert(`CLEARED\nTime: ${timerDisplay.textContent}\nMoves: ${moveCount}`);
-                const sText = document.getElementById('scrambleText');
-                sText.style.display = 'inline-block';
-                sText.textContent = 'again';
             }, 50); 
         }
     });
