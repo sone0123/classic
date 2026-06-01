@@ -228,7 +228,9 @@ function handleSwipe(dx, dy, faceName, cubie) {
             
             setTimeout(() => {
                 alert(`CLEARED\nTime: ${timerDisplay.textContent}\nMoves: ${moveCount}`);
-                scrambleBtn.textContent = "scramble (again)";
+                const sText = document.getElementById('scrambleText');
+                sText.style.display = 'inline-block';
+                sText.textContent = 'again';
             }, 50); 
         }
     });
@@ -363,14 +365,12 @@ function updateStatusDisplay() {
 function performScramble(movesLeft) {
     if (movesLeft <= 0) {
         scrambleBtn.disabled = false;
-        scrambleBtn.textContent = "scramble";
         // スクランブル完了時にタイマー開始
         startTimer();
         return;
     }
 
     scrambleBtn.disabled = true;
-    scrambleBtn.textContent = `scrambling... (${movesLeft})`;
 
     const axes = ['x', 'y', 'z'];
     const slices = [-1, 0, 1];

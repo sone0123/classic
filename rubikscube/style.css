@@ -70,36 +70,23 @@ body {
 .top    { transform: rotateX( 90deg) translateZ(29px); }
 .bottom { transform: rotateX(-90deg) translateZ(29px); }
 
+/* スクランブルボタン */
 #scrambleBtn {
     position: absolute;
     top: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    background-color: #f39c12;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
+    left: 60px;
+    color: white;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: background 0.2s, transform 0.1s;
-}
-
-#scrambleBtn:hover {
-    background-color: #e67e22;
-}
-
-#scrambleBtn:active {
-    transform: scale(0.95);
+    background: none;
+    border: none;
 }
 
 #scrambleBtn:disabled {
-    background-color: #7f8c8d;
     cursor: default;
-    transform: none;
+    color: #555;
 }
 
+/* ホームボタン */
 #homeBtn {
     position: absolute;
     top: 20px;
@@ -112,16 +99,16 @@ body {
 #statusHUD {
     font-family: "Noto Sans Mono", monospace;
     position: absolute;
-    bottom: 20px;
-    font-size: 1.4rem;
+    top: 20px;
+    right: 20px;
+    font-size: 1.3rem;
     color: white;
     pointer-events: none;
-    z-index: 10;
 }
 
 /* タイマーアイコン */
 #timerDisplay::before {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>');
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>');
     display: inline-block;
     vertical-align: middle;
     margin-right: 10px;
@@ -131,7 +118,7 @@ body {
 
 /* カウントアイコン */
 #moveCountDisplay::before {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="19 9 22 12 19 15"></polyline><polyline points="9 19 12 22 15 19"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>');
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="19 9 22 12 19 15"></polyline><polyline points="9 19 12 22 15 19"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>');
     display: inline-block;
     vertical-align: middle;
     margin-right: 10px;
