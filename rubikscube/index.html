@@ -3,18 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <title>Rubik's Cube Simulator | Puzzle Collection</title>
+    <meta name="description" content="Simple Rubik's Cube Simulator in the browser, with scramble, timer, and move counter features.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sone0123.github.io/classic/rubikscube/">
+
+    <!-- SEO: OG & Twitter -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Puzzle Collection">
+    <meta property="og:title" content="Rubik's Cube Simulator | Puzzle Collection">
+    <meta property="og:description" content="Simple Rubik's Cube Simulator in the browser, with scramble, timer, and move counter features.">
+    <meta property="og:url" content="https://sone0123.github.io/classic/rubikscube/">
+    <meta property="og:image" content="https://sone0123.github.io/classic/public/web-app-manifest-512x512.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rubik's Cube Simulator | Puzzle Collection">
+    <meta name="twitter:description" content="Simple Rubik's Cube Simulator in the browser, with scramble, timer, and move counter features.">
+    <meta name="twitter:image" content="https://sone0123.github.io/classic/public/web-app-manifest-512x512.png">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap" rel="stylesheet">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../public/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../public/favicon.svg" />
+    <link rel="shortcut icon" href="../public/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../public/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Puzzles" />
+    <link rel="manifest" href="../public/site.webmanifest" />
+
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <title>Rubik's Cube Simulator</title>
+    <!-- SEO: Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Rubik's Cube Simulator",
+        "url": "https://sone0123.github.io/classic/rubikscube/",
+        "description": "A simple Rubik's Cube Simulator in the browser, with scramble, timer, and move counter features.",
+        "applicationCategory": "Game",
+        "operatingSystem": "Web browser",
+        "publisher": {
+            "@type": "Person",
+            "name": "Sone",
+            "url": "https://github.com/sone0123"
+        },
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "Puzzle Collection",
+            "url": "https://sone0123.github.io/classic/"
+        }
+    }
+    </script>
 </head>
 <body>
+    <!-- SEO: Accessibility -->
+    <main class="visually-hidden">
+        <h1>Rubik's Cube Simulator</h1>
+        <p>Simple Rubik's Cube Simulator in the browser, with scramble, timer, and move counter features.</p>
+    </main>
+
     <!-- ホームボタン -->
     <a id="homeBtn" href=".." aria-label="Home" title="Home">
         <svg
